@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import React, { useEffect, useState } from 'react';
+import Note from './components/Note';
+import NoteSubmitter from './components/NoteSubmitter';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [notes, setNotes] = useState([]);
+
+  const titleHandler = (e) => {
+    setTitle(e.target.value);
+  }
+
+  const contentHandler = (e) => {
+    setContent(e.target.value);
+  }
+
+  // submit note
+  const submit = (e) => {
+    e.preventDefault();
+
+    if (title === '' || content === '') {
+      alert("Cannot submit empty note!");
+      return;
+    }
+
+    // add new note
+    const newNote = {
+      title: title,
+      content: content
+    }
+    const newNotes = [newNote, ...notes]
+    setNotes(newNotes);
+
+    // write to local storage
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+
+    // clear the form
+    setTitle('');
+    setContent('');
+
+  }
+
+  // load notes from local storage upon first render
+  useEffect(() => {
+    const notes = JSON.parse(localStorage.getItem('notes'));
+    if (notes) {
+      setNotes(notes);
+    }
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="App">
+        <h1>Notes</h1>
+        <div className="notes">
+          {notes.map((note, id) => (
+            <Note
+              key={id}
+              title={note.title}
+              content={note.content}
+            />
+          ))}
+          <NoteSubmitter
+            titleHandler={titleHandler}
+            title={title}
+            contentHandler={contentHandler}
+            content={content}
+            buttonHandler={submit}
+          />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
 export default App
