@@ -2,15 +2,14 @@
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  /* text-align: center; */
 }
 
 .card {
+  position: relative;
   padding: 2em;
   border-bottom: 1px solid gray;
 }
 .card:first-child {
-  padding: 2em;
   border-top: 1px solid gray;
 }
 

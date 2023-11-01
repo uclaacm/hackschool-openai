@@ -17,9 +17,7 @@ const App = () => {
   }
 
   // submit note
-  const submit = (e) => {
-    e.preventDefault();
-
+  const submit = () => {
     if (title === '' || content === '') {
       alert("Cannot submit empty note!");
       return;
@@ -42,6 +40,13 @@ const App = () => {
 
   }
 
+  const deleteNote = (id) => {
+    const newNotes = [...notes];
+    newNotes.splice(id, 1);
+    setNotes(newNotes);
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+  }
+
   // load notes from local storage upon first render
   useEffect(() => {
     const notes = JSON.parse(localStorage.getItem('notes'));
@@ -60,6 +65,7 @@ const App = () => {
               key={id}
               title={note.title}
               content={note.content}
+              deleteHandler={() => deleteNote(id)}
             />
           ))}
           <NoteSubmitter
