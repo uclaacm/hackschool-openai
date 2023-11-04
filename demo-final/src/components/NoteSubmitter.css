@@ -1,0 +1,61 @@
+#note-submit {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    margin: 32px;
+    height: 20%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+#title-input {
+    padding: 20px;
+    padding-bottom: 10px;
+    font-size: 16px;
+    border: none;
+    transition: box-shadow 0.3s ease;
+    font-weight: bold;
+    font-size: 1.5em;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    width: 350px;
+}
+
+#title-input:focus {
+    outline: none;
+}
+
+textarea {
+    padding: 20px;
+    padding-top: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition: box-shadow 0.3s ease;
+    resize: none;
+
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    width: 350px;
+    height: 100%;
+}
+
+textarea:focus {
+    outline: none;
+}
+
+#button-submit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    border-radius: 30px;
+    height: 50px;
+    width: 50px;
+    font-weight: bold;
+}

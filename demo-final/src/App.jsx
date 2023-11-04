@@ -2,11 +2,16 @@ import './App.css';
 import React, { useEffect, useState } from 'react';
 import Note from './components/Note';
 import NoteSubmitter from './components/NoteSubmitter';
+import OpenAI from "openai";
 
 const App = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [notes, setNotes] = useState([]);
+  const [openai, _] = useState(new OpenAI({
+    apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
+    dangerouslyAllowBrowser: true,
+  }));
 
   const titleHandler = (e) => {
     setTitle(e.target.value);
@@ -18,6 +23,21 @@ const App = () => {
 
   // submit note
   const submit = async () => {
+    // check if @gpt is present and send OpenAI API request if so
+    if (title.includes("@gpt") || content.includes("@gpt")) {
+      const prompt = title.replace("@gpt", "") + " " + content.replace("@gpt", "");
+      let response = await openai.chat.completions.create({
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: prompt }
+        ],
+        model: "gpt-3.5-turbo",
+      })
+      response = response.choices[0].message.content;
+      setContent(content + "\n\n" + response);
+      return;
+    }
+
     // prevent empty note
     if (title === '' || content === '') {
       alert("Cannot submit empty note!");
@@ -38,6 +58,7 @@ const App = () => {
     // clear the form
     setTitle('');
     setContent('');
+
   }
 
   const deleteNote = (id) => {
@@ -54,7 +75,6 @@ const App = () => {
       setNotes(notes);
     }
   }, []);
-
 
   return (
     <>
