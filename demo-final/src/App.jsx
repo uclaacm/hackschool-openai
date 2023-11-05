@@ -34,7 +34,7 @@ const App = () => {
         model: "gpt-3.5-turbo",
       })
       response = response.choices[0].message.content;
-      setContent(content + "\n\n" + response);
+      setContent(content.trimEnd() + "\n\n" + response);
       return;
     }
 

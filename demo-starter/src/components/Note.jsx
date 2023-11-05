@@ -7,7 +7,7 @@ const Note = ({title, content, deleteHandler}) => {
         <div className="card">
             <button className="button-delete" onClick={deleteHandler}>x</button>
             <h2>{title}</h2>
-            <p>{content}</p>
+            <p style={{whiteSpace: "pre-line"}}>{content}</p>
         </div>        
         </>
     );

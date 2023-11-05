@@ -4,6 +4,11 @@
   padding: 2rem;
 }
 
+.App {
+  max-width: 768px;
+  margin-right: 350px;
+}
+
 .card {
   position: relative;
   padding: 2em;
