@@ -12,6 +12,7 @@ const App = () => {
     apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
     dangerouslyAllowBrowser: true,
   }));
+  const [systemPrompt, setSystemPrompt] = useState("");
 
   const titleHandler = (e) => {
     setTitle(e.target.value);
@@ -25,16 +26,22 @@ const App = () => {
   const submit = async () => {
     // check if @gpt is present and send OpenAI API request if so
     if (title.includes("@gpt") || content.includes("@gpt")) {
-      const prompt = title.replace("@gpt", "") + " " + content.replace("@gpt", "");
+      const prompt = `${title.replace("@gpt", "")} ${content.replace("@gpt", "")}`;
+      console.log(systemPrompt);
+      const trimmedContent = content.trimEnd();
+
+      // indicate that the query is being processed
+      setContent(`${trimmedContent}\n\nThinking...`.trim());
+
       let response = await openai.chat.completions.create({
         messages: [
-          { role: "system", content: "You are a helpful assistant." },
+          { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
         ],
         model: "gpt-3.5-turbo",
       })
       response = response.choices[0].message.content;
-      setContent(content.trimEnd() + "\n\n" + response);
+      setContent(`${trimmedContent}\n\n${response}`.trim());
       return;
     }
 
@@ -58,7 +65,6 @@ const App = () => {
     // clear the form
     setTitle('');
     setContent('');
-
   }
 
   const deleteNote = (id) => {
@@ -74,6 +80,15 @@ const App = () => {
     if (notes) {
       setNotes(notes);
     }
+  }, []);
+
+  // initialize system prompt to include all notes
+  useEffect(() => {
+    let prompt = "Answer questions based on the user's notes. You should always identify the notes where you got the information by title. If the user does not ask a question about the notes, then answer as an AI assistant. The notes are shown here: \n\n";
+    notes.forEach((note) => {
+      prompt += `(Title: ${note.title}\n\nContent:\n${note.content})\n\n`;
+    });
+    setSystemPrompt(prompt);
   }, []);
 
   return (
