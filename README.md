@@ -12,6 +12,10 @@
 - [Sneak Peek](#sneak-peek)
 - [Why Generative AI?](#why-generative-ai)
 - [Set Up](#set-up)
+- [Review](#review)
+- [What's On the Menu? (APIs)](#whats-on-the-menu)
+- [Implementing @cat](#implementing-cat)
+- [Implementing the AI Assistant](#implementing-the-ai-assistant)
 
 ## Prelude
 
@@ -171,23 +175,22 @@ First, it would probably be helpful to walk through the code. I'm not going to g
 
 That's what I would say if we hadn't installed GitHub Copilot. Luckily, GitHub Copilot can explain the code for us! All we need to do is highlight all the code in `App.jsx` and run the /explain command. This is what it outputs for me:
 
-```
-This JavaScript React code is for a simple note-taking application. The application allows users to create, view, and delete notes. The notes are stored in the local storage of the user's browser.
 
-The code starts by importing necessary dependencies and components. The useState and useEffect hooks from React are imported, which are used for managing state and side effects in the application. Two custom components, Note and NoteSubmitter, are also imported.
-
-The App function component is defined next. Inside this component, several pieces of state are declared using the useState hook: title and content for the current note being created, and notes for the list of all notes.
-
-Two handler functions, titleHandler and contentHandler, are defined. These functions update the title and content state respectively when the user types into the corresponding input fields.
-
-The submit function is defined to handle the submission of a new note. It first checks if the title or content is empty, and if so, it alerts the user and returns early. Otherwise, it creates a new note object, adds it to the list of notes, and updates the notes state. It then stores the updated list of notes in local storage and clears the title and content state.
-
-The deleteNote function is defined to handle the deletion of a note. It removes the note at the given index from the list of notes, updates the notes state, and updates the list of notes in local storage.
-
-The useEffect hook is used to load the list of notes from local storage when the component first renders. If there are any notes in local storage, it updates the notes state with these notes.
-
-Finally, the component returns a JSX element that renders the application. It displays a list of all notes, with each note rendered using the Note component. It also includes the NoteSubmitter component, which is used to create new notes. The handlers and state are passed as props to these components. The App component is then exported for use in other parts of the application.
-```
+>This JavaScript React code is for a simple note-taking application. The application allows users to create, view, and delete notes. The notes are stored in the local storage of the user's browser.
+>
+>The code starts by importing necessary dependencies and components. The useState and useEffect hooks from React are imported, which are used for managing state and side effects in the application. Two custom components, Note and NoteSubmitter, are also imported.
+>
+>The App function component is defined next. Inside this component, several pieces of state are declared using the useState hook: title and content for the current note being created, and notes for the list of all notes.
+>
+>Two handler functions, titleHandler and contentHandler, are defined. These functions update the title and content state respectively when the user types into the corresponding input fields.
+>
+>The submit function is defined to handle the submission of a new note. It first checks if the title or content is empty, and if so, it alerts the user and returns early. Otherwise, it creates a new note object, adds it to the list of notes, and updates the notes state. It then stores the updated list of notes in local storage and clears the title and content state.
+>
+>The deleteNote function is defined to handle the deletion of a note. It removes the note at the given index from the list of notes, updates the notes state, and updates the list of notes in local storage.
+>
+>The useEffect hook is used to load the list of notes from local storage when the component first renders. If there are any notes in local storage, it updates the notes state with these notes.
+>
+>Finally, the component returns a JSX element that renders the application. It displays a list of all notes, with each note rendered using the Note component. It also includes the NoteSubmitter component, which is used to create new notes. The handlers and state are passed as props to these components. The App component is then exported for use in other parts of the application.
 
 Pretty cool, right? And, at least in this case, pretty accurate. You can imagine why /explain would be useful if you're working in an unfamiliar code base. Rather than having to read through the code and understand everything yourself, you can have Copilot explain it to you! If there's anything that's unclear about the explanation, you can ask it to clarify.
 
