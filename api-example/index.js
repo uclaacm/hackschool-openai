@@ -1,8 +1,27 @@
+/*
+Cat Facts API
+---------------------
+
+GET / 
+- Root page
+
+GET /fact
+- Sends a random cat fact in plain text
+
+GET /facts
+- Sends all facts on the server
+
+PUT /newfact:fact
+- Adds the fact param to the list of cat facts.
+
+*/
 
 const express = require('express');
+const cors = require('cors');
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 let facts = [
     "Cats have five toes on their front paws but only four toes on their back paws.",
@@ -16,6 +35,7 @@ let facts = [
     "A cat's whiskers are roughly as wide as its body, which helps the animal determine whether it can fit through narrow openings.",
     "The first cat in space was a French cat named Félicette (or 'Astrocat') who, in 1963, survived a trip to space that lasted 13 minutes."
 ]
+
 
 app.get('/', (_, res) => {
     res.send('Use /fact to see an interesting cat fact!');

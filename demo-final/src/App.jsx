@@ -8,7 +8,7 @@ const App = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [notes, setNotes] = useState([]);
-  const [openai, _] = useState(new OpenAI({
+  const [openai] = useState(new OpenAI({
     apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
     dangerouslyAllowBrowser: true,
   }));
@@ -25,45 +25,53 @@ const App = () => {
 
   // submit note
   const submit = async () => {
-    // process @gpt command to get assistant response
-    if (title.includes("@gpt") || content.includes("@gpt")) {
-      const prompt = `${title.replace("@gpt", "")} ${content.replace("@gpt", "")}`;
-      const trimmedContent = content.trimEnd();
+    // check for @gpt command
+    let newContent = content.trim();
+    if (title.includes('@gpt') || content.includes('@gpt')) {
+      const prompt = title + " " + content;
 
-      // indicate that the query is being processed
-      setContent(`${trimmedContent}\n\nThinking...`.trim());
+      setContent(newContent + `\n\nThinking...`);
 
-      let response = await openai.chat.completions.create({
+      const response = await openai.chat.completions.create({
+        model: "gpt-4-1106-preview",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: prompt }
-        ],
-        model: "gpt-4-1106-preview",
-      })
-      response = response.choices[0].message.content;
-      setContent(`${trimmedContent}\n\n${response}`.trim());
+          { role: "user", content: prompt },
+        ]
+      });
 
+      const data = response.choices[0].message.content;
+      newContent += `\n\n${data}`;
+      setTitle(title.replace("@gpt", ""));
+      setContent(newContent.replace("@gpt", ""));
       return;
     }
 
-    // process @img command to generate image
-    if (title.includes("@img") || content.includes("@img")) {
-      const prompt = `${title.replace("@img", "")} ${content.replace("@img", "")}`;
-      const trimmedContent = content.trimEnd();
+    // check for @img command
+    if (title.includes('@img') || content.includes('@img')) {
+      const prompt = title + " " + content;
 
-      // indicate that the query is being processed
-      setContent(`${trimmedContent}\n\nThinking...`.trim());
+      setContent(newContent + `\n\nThinking...`);
 
-      const imgResponse = await openai.images.generate({
+      const response = await openai.images.generate({
         model: "dall-e-3",
-        prompt
+        prompt: prompt,
       });
-      setImage(imgResponse.data[0].url);
-      console.log(imgResponse.data[0].url);
+
+      setImage(response.data[0].url);
 
       // remove image command so that user can submit note with new image
-      setTitle(`${title.replace("@img", "")}`);
-      setContent(`${trimmedContent.replace("@img", "")}`.trim());
+      setTitle(title.replace("@img", ""));
+      setContent(content.replace("@img", ""));
+      return;
+    }
+
+    // check for @cat command
+    if (title.includes('@cat') || content.includes('@cat')) {
+      const response = await fetch('http://localhost:8080/fact');
+      const data = await response.text();
+      newContent += `\n\nCat Fact: ${data}`;
+      setContent(newContent);
       return;
     }
 
@@ -75,13 +83,12 @@ const App = () => {
 
     // add new note
     const newNote = {
-      title,
-      content,
-      image,
+      title: title,
+      content: newContent,
+      image: image
     }
     const newNotes = [newNote, ...notes]
     setNotes(newNotes);
-    setImage(""); // clear image
 
     // write to local storage
     localStorage.setItem('notes', JSON.stringify(newNotes));
@@ -89,6 +96,7 @@ const App = () => {
     // clear the form
     setTitle('');
     setContent('');
+    setImage('');
   }
 
   const deleteNote = (id) => {
@@ -114,7 +122,7 @@ const App = () => {
       prompt += `(Title: ${note.title}\n\nContent:\n${note.content})\n\n`;
     });
     setSystemPrompt(prompt);
-  }, []);
+  }, [notes]);
 
   return (
     <>

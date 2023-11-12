@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Note from './components/Note';
 import NoteSubmitter from './components/NoteSubmitter';
 
@@ -17,7 +17,7 @@ const App = () => {
   }
 
   // submit note
-  const submit = async () => {
+  const submit = () => {
     // prevent empty note
     if (title === '' || content === '') {
       alert("Cannot submit empty note!");

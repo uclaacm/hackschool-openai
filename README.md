@@ -148,10 +148,202 @@ Now back to some review: asynchronous programming! Asynchronous programming is a
 
 [^4]: Some of you may recall from last week that Javascript (both in the browser and in node) is single-threaded. You may be wondering then, how is asynchronous programming implemented? Don't we need multiple threads to prevent blocking? Actually, no. In Javascript, asynchronous programming is implemented via a clever trick called a  callback queue. If you're interested, check out [this](https://archive.ph/N6DUl) article for more information!
 
-One option that Javascript provides for network requests is the `fetch` function. 
+One option that Javascript provides for network requests is the `fetch` function, which just so happens to be an asynchronous function. 
 
-implement cat fact functionality into note app
+```js
+let res = fetch(serverURL) // fetch returns a promise!
+```
 
+The `fetch` function makes it really easy to make GET requests! All we have to do is pass in the URL of the server and the respective endpoint and it will return a promise representing the eventual fulfillment of that request. Remember that we could deal with this promise in one of two ways:
 
+1. `.then`
+2. async/await
 
+For this workshop we're going to use async/await, but it's really up to personal preference whichever one you want to use. They both allow you to get values from within promises.
 
+Let's try putting all of this into action! I want to add some functionality to our starter notes app: a new command called @cat that generates a random cat fact and adds it to the current note. We're going to use our cat facts API to accomplish this.[^5]
+
+[^5]: It wouldn't be too difficult to just do this ourselves, but for the sake of learning let's use the API.
+
+## Implementing @cat
+
+First, it would probably be helpful to walk through the code. I'm not going to go through everything as there's not much of a point, but at the very least I'll show you `App.jsx`.
+
+That's what I would say if we hadn't installed GitHub Copilot. Luckily, GitHub Copilot can explain the code for us! All we need to do is highlight all the code in `App.jsx` and run the /explain command. This is what it outputs for me:
+
+```
+This JavaScript React code is for a simple note-taking application. The application allows users to create, view, and delete notes. The notes are stored in the local storage of the user's browser.
+
+The code starts by importing necessary dependencies and components. The useState and useEffect hooks from React are imported, which are used for managing state and side effects in the application. Two custom components, Note and NoteSubmitter, are also imported.
+
+The App function component is defined next. Inside this component, several pieces of state are declared using the useState hook: title and content for the current note being created, and notes for the list of all notes.
+
+Two handler functions, titleHandler and contentHandler, are defined. These functions update the title and content state respectively when the user types into the corresponding input fields.
+
+The submit function is defined to handle the submission of a new note. It first checks if the title or content is empty, and if so, it alerts the user and returns early. Otherwise, it creates a new note object, adds it to the list of notes, and updates the notes state. It then stores the updated list of notes in local storage and clears the title and content state.
+
+The deleteNote function is defined to handle the deletion of a note. It removes the note at the given index from the list of notes, updates the notes state, and updates the list of notes in local storage.
+
+The useEffect hook is used to load the list of notes from local storage when the component first renders. If there are any notes in local storage, it updates the notes state with these notes.
+
+Finally, the component returns a JSX element that renders the application. It displays a list of all notes, with each note rendered using the Note component. It also includes the NoteSubmitter component, which is used to create new notes. The handlers and state are passed as props to these components. The App component is then exported for use in other parts of the application.
+```
+
+Pretty cool, right? And, at least in this case, pretty accurate. You can imagine why /explain would be useful if you're working in an unfamiliar code base. Rather than having to read through the code and understand everything yourself, you can have Copilot explain it to you! If there's anything that's unclear about the explanation, you can ask it to clarify.
+
+In my case, I want to add a new command: @cat. The way I want this to work is that if the string "@cat" is found within the title or content of a new note that is being submitted, I want a random cat fact from the Cat Facts API we made to be added to the note. 
+
+1. The place that makes the most sense to add this functionality is within the `submit` function.
+2. In particular, we should add a check before any of the other code is run that determines whether the substring is present.
+3. If it is, we'll use `fetch` to submit an HTTP request to our server (which in this case will be running on http://localhost:8080). The endpoint we want to use is GET /fact (which returns a random fact from the list of facts).
+4. Since, fetch returns a promise, we'll unwrap this promise using async/await.
+5. After that, we can append our new fact to the note!
+
+Let's try giving the above plan to Copilot and see what it comes up with! We can generate new code directly in our editor with the shortcut `CMD+I` on Mac (not sure what it is on Windows if I'm being honest, so my best guess is probably `Ctrl+I`). Here's the code it generated for me.
+
+```js
+  // submit note
+  const submit = async () => {
+    // prevent empty note
+    if (title === '' || content === '') {
+      alert("Cannot submit empty note!");
+      return;
+    }
+
+    // check for cat fact
+    let newContent = content;
+    if (title.includes('@cat') || content.includes('@cat')) {
+      const response = await fetch('http://localhost:8080/fact');
+      const data = await response.json();
+      newContent += `\n\nCat Fact: ${data.fact}`;
+    }
+
+    // add new note
+    const newNote = {
+      title: title,
+      content: newContent
+    }
+    const newNotes = [newNote, ...notes]
+    setNotes(newNotes);
+
+    // write to local storage
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+
+    // clear the form
+    setTitle('');
+    setContent('');
+  }
+```
+
+Not quite what I was after, but it's a good start. Notice that it changed submit into an asynchronous function. It also added the cat fact logic, although it put it after the empty note prevention. I'm going to move the cat fact block up before this, and return after it finishes, that way the user can look at the cat fact that they generated before submitting their note.
+
+After my changes, `submit` looks like this:
+
+```js
+const submit = async () => {
+    // check for cat fact
+    let newContent = content;
+    if (title.includes('@cat') || content.includes('@cat')) {
+      const response = await fetch('http://localhost:8080/fact');
+      const data = await response.json(); // PROBLEM
+      newContent += `\n\nCat Fact: ${data.fact}`; // PROBLEM
+      return; // PROBLEM
+    }
+
+    // prevent empty note
+    if (title === '' || content === '') {
+      alert("Cannot submit empty note!");
+      return;
+    }
+
+    // add new note
+    const newNote = {
+      title: title,
+      content: newContent
+    }
+    const newNotes = [newNote, ...notes]
+    setNotes(newNotes);
+
+    // write to local storage
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+
+    // clear the form
+    setTitle('');
+    setContent('');
+  }
+```
+
+There's two more big problems with this code: 
+
+1. Our endpoint returns plain text, not json (which I know since I read the API). We need to change `response.json()` to `response.text()`. Likewise, since data is not an object, we need to change `data.fact` to just `data`.
+2. We're not updating content variable, so it's not going to show up in the content area. We need to add `setContent(newContent)` to the function.
+
+I'm also going to add a simple quality of life change by making `newContent` equal to `content.trim()` (this removes trailing white space from content).
+
+Here's the final `submit` function:
+```js
+const submit = async () => {
+    // check for cat fact
+    let newContent = content.trim();
+    if (title.includes('@cat') || content.includes('@cat')) {
+      const response = await fetch('http://localhost:8080/fact');
+      const data = await response.text();
+      newContent += `\n\nCat Fact: ${data}`;
+      setContent(newContent);
+      return;
+    }
+
+    // prevent empty note
+    if (title === '' || content === '') {
+      alert("Cannot submit empty note!");
+      return;
+    }
+
+    // add new note
+    const newNote = {
+      title: title,
+      content: newContent
+    }
+    const newNotes = [newNote, ...notes]
+    setNotes(newNotes);
+
+    // write to local storage
+    localStorage.setItem('notes', JSON.stringify(newNotes));
+
+    // clear the form
+    setTitle('');
+    setContent('');
+  }
+```
+
+You can see Copilot made a lot of subtle mistakes in this case. This is why we always want to be sure to look over the code Copilot generates! But we've now sucessfully implemented our @cat command. Neat! 
+
+## Implementing the AI Assistant
+
+Now that we've gotten the warm up out of the way, we can go on to the exciting part of today's workshop: implementing the AI assistant. To do this, we're going to extend our apps commands to include:
+
+1. @gpt: This will prompt our AI assistant to respond to whatever we've written in the current note
+2. @img: This will prompt our AI assitant to generate an image based on the current note
+
+To implement both of these features, we're going to take advantage of the OpenAI API. We'll see that this API is bit more involved than our Cat Facts API. OpenAI has also implemented a layer of abstraction over it via their own library, so we're going to install that. As a result, we're not going to have to manually call `fetch` or anything like that, but the principles remain the same. Let's get started.
+
+> Note: OpenAI's API is not free. But for our purposes, it's very cheap, only costing a fraction of a cent per request. The image generation API is a bit more expensive. Prices vary by model with GPT 4 tending to cost more than GPT 3.5. More details on pricing can be found on OpenAI's website.
+
+1. To start, we're going to want to make an OpenAI account.
+2. Load some money into the balance.
+3. Generate an API key.
+4. Install OpenAI library
+5. Initialize OpenAI object w/ API key (never hardcode API key, but for simplicity we will)
+6. Implement @gpt functionality[^6]
+7. System prompt is where we define role
+8. Test it out
+9. We want the user to be able to ask about their existing notes -> change system prompt (preface this is not the best way to implement this, but it'll do for now) (also have to do a bit on useEffect and life cycle)
+10. Test it out
+11. implement @img functionality
+12. Test it out
+13. cool
+
+[^6]: While I was working on this workshop, OpenAI released a new API called the assistants API. I decided not to include it here, because it's still in beta, but keep in mind that that is likely going to be the preferred API in the future.
+
+TODO: flesh out demo above in readme
+TODO: closing remarks on generative AI
