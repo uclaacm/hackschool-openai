@@ -7,6 +7,7 @@ const App = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [notes, setNotes] = useState([]);
+  const [image, setImage] = useState("");
 
   const titleHandler = (e) => {
     setTitle(e.target.value);
@@ -27,7 +28,8 @@ const App = () => {
     // add new note
     const newNote = {
       title: title,
-      content: content
+      content: content,
+      image: image
     }
     const newNotes = [newNote, ...notes]
     setNotes(newNotes);
@@ -66,6 +68,7 @@ const App = () => {
               key={id}
               title={note.title}
               content={note.content}
+              iamge={note.image}
               deleteHandler={() => deleteNote(id)}
             />
           ))}
@@ -75,6 +78,7 @@ const App = () => {
             contentHandler={contentHandler}
             content={content}
             buttonHandler={submit}
+            image={image}
           />
         </div>
       </div>
