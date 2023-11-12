@@ -9,6 +9,8 @@
 ## Contents
 - [Prelude](#prelude)
 - [The State of AI](#the-state-of-ai)
+- [Sneak Peek](#sneak-peek)
+- [Why Generative AI?](#why-generative-ai)
 - [Set Up](#set-up)
 
 ## Prelude
@@ -31,19 +33,124 @@ Website: [hack.uclaacm.com](https://hack.uclaacm.com/) <br>
 
 Unless you've been living under a rock, you've probably heard of ChatGPT. It was released almost exactly a year ago now, and has since grown faster than (almost) any other product ever released, hitting 100 million users in just two months. 
 
-<img src="./img/chatgpt-100mil.webp" width=450px/>
+<img src="./img/chatgpt-100mil.webp" width=450px/> <br>
 
-With its explosive growth has also come a lot of concern over how it might impact the world ten or twenty years down the line. So many people -- writers, artists, coders -- are scared they're going to be replaced. Recently we saw one of the longest writer's strikes ever in Hollywood, and one of their biggest demands was to disallow the use of generative AI by entertainment companies. Eventually the media agreed to this demand, but it's not clear how long they intend to uphold that promise. Beyond that, we've seen a lot of outrage from people who produce content: they claim their work is being stolen by companies like OpenAI to train their models. Yikes! 
+With its explosive growth has also come a lot of concern over how it might impact the world ten or twenty years down the line. So many people -- writers, artists, coders -- are scared they're going to be replaced. Recently we saw one of the longest writer's strikes ever in Hollywood, and one of their biggest demands was to disallow the use of generative AI by entertainment companies. Eventually the media agreed to this demand, but it's not clear how long they intend to uphold that promise. Beyond that, we've seen a lot of outrage from people who produce content: they claim their work is being stolen by companies like OpenAI to train their models.[^1] Yikes! 
+
+[^1]: It's clear that OpenAI recognize this is an issue based on their recent announcement: Copyright Shield. They will step in and pay the legal fees of anyone sued for copyright infringement for using their models. My jaw actually dropped when I heard about this.
 
 So it's a bit of a moral grey area. At least that's how it feels to me. That being said, I don't think its productive to just sit around and wait while our government catches up and starts regulating things. We might as well learn to use it to our advantage! 
 
-It's worth noting that the current consensus is that generative AI is not going to replace software engineers anytime soon, though it will certainly automate away much of the tedium involved. ChatGPT and even GPT 4 seem very sophisticated from a surface level, but they have one huge flaw: they are incapable of synthesizing new ideas. This means that fields that require creativity and innovation are safe for the time being. Fingers crossed.
+It's worth noting that the current consensus is that generative AI is not going to replace software engineers anytime soon, though it will certainly automate away much of the tedium involved. ChatGPT and even GPT 4 seem very sophisticated from a surface level, but they have one huge flaw: they are incapable of synthesizing new ideas. If a program has never been written before (or it is not included in the training set), GPT 4 will be incapable of producing it. At the opposite side of the spectrum, if a program has been written countless times, but each of those times it has had a glaring security flaw, then GPT will continue to include that security flaw.[^2] The bottom line is this: human ingenuity is not being automated away quite yet. Fields that require creativity and innovation will continue to thrive. Fingers crossed.
+
+[^2]: Credit to Philip Wadler, a designer of Haskell and theoretical computer scientist, in Carey Nachenberg's CS 131 for the take. 
+
+## Sneak Peek
+
+All that being said, the goal of today's workshop is to teach you how to use generative AI to make your life as a web developer easier using GitHub Copilot, a VSCode extension that builds ChatGPT like functionality into your code editor. The secondary goal is to create a notes app with an intelligent assistant built in. Through this process we'll learn about APIs, the React app life cycle, and some very basic prompt engineering (and by prompt engineering I mean writing one prompt).
+
+Here's a look at the app we're going to build!
+
+![NOTion logo](./img/NOTion.png)
+
+![Notes app demo preview](./img/demo-preview-1.png)
+
+Notice the @gpt command on the right! We'll also be adding an @img command to allow users to generate images based on their notes. See below! 
+
+![Notes app image demo preview](./img/demo-preview-2.png)
+
+Kinda cool, right? Let's get into it.
+
+## Why GitHub Copilot?
+
+You might be wondering, why should I as a web developer care about any of this? The bottom line is that it is going to remove a lot of the road blocks that people often hit as new developers, while also getting rid of a lot of the tedium that experienced engineers face! You won't have to look up obscure functions or quirky syntax any longer! It also makes reasoning about existing code much easier, as you can ask it to explain an existing code block or to generate unit tests or fix a bug. GitHub Copilot is also rapidly becoming the industry standard (though there are some signicant holdouts), and GitHub claims that it leads to "55% faster coding." Pretty cool! 
+
+This all sounds pretty great, but its important to note that the technology is not perfect. It makes a lot of mistakes, so its important to review any generated code for errors! 
 
 ## Set Up
 
+First things first, let's get GitHub Copilot installed. You can do this on a number of text editors (including vim), but we're going to use VSCode. Normally Copilot is going to cost you a monthly subscription, but it comes for free if you have a student account. Here's how you can do that (if you haven't already):
 
+1. Visit the student developer Pack main page (education.github.com/pack)
+2. Sign Up for the student developer pack
+3. Select Get Student Benefit
+4. Sign-in or SignUp for a GitHub account.
+5. Add your school email. This process usually needs some authentication, because a code will be sent to your school email for verification.
+8. You might need to upload proof of attendance. Something like your bruincard works.
+9. It might take a bit but you should hear back from them soon. I did it a while ago, but I think I got access the next day.
 
+Now that you have your student account set up (or you've decided to shell out the subscription money), let's install the GitHub Copilot extension onto VSCode.
 
+1. First, you need to activate Copilot from you GitHub account settings. Navigate to the settings page by clicking on your profile picture and clicking on settings in the drop down menu.
+2. In the side bar, there should be a Copilot section. You can activate Copilot from this page.
+3. Look up Copilot in the extension page in VSCode (which you can find in the left side bar, it looks like a couple squares being fit together) and install it, along with the chat extension.
+4. You should see a new sidebar icon pop up. This means that Copilot is successfully installed!
+
+To test it out, try asking it a question! 
+
+## Review
+
+Before we get going integrating our assistant into the notes app, let's do a quick review of some of the topics we covered last week. In particular, let's talk about servers, HTTP requests, and asynchronous programming (you'll see that all of this is going to be essential to building our demo today).
+
+### Servers
+
+The best way to think of a server (in my opinion), is as a black box. Essentially, you give it some input, it performs some computation behind the scenes, and it gives you some output. Pretty simple right? The key thing to note here is that you don't necessarily know what computation the server performs behind the scenes, and you don't care! As long as it does the thing you ask it to, you're happy. 
+
+Any computer can be a server as long as it fulfills one important role: it listens for and **responds to requests** from other computers that we call **clients**. You can think of the interaction between a client and a server like the interaction between a customer and the staff at a restaurant. The customer requests some food and the staff prepares it and sends it to them. Similarly, the client computer requests some information or data and the server prepares it and sends it to them.
+
+![Client server model](./img/client-server-model.png)
+
+This brings up an important question: how do the client and server communicate? In the restaurant analogy, the customer can just use plain english and they'll (probably) be understood. Our client and our server also need a common language! That brings us to...
+
+### HTTP 
+
+HTTP is one example of a **protocol**, or a common language, between two computers. Basically, HTTP just defines a consistent way for clients and servers to communicate over the internet. There are a lot of details I'm glossing over here but the key components of HTTP that you should be aware of are the different request methods as well as hosts and endpoints.
+
+#### Request Methods
+
+Request methods are used to indicate what kind of action the client wants the server to perform. For example:
+
+ - GET: indicates a request to *get* data
+ - POST: indicates a request will update the state of the server and typically involves sending some data from the client
+ - PUT: indicates a request will update some existing resource on the server
+ - DELETE: indicates a request will *delete* a resource
+ 
+ ...and there are many more.
+
+#### Hosts and Endpoints
+
+Together, the host and endpoint indicate where the client wants to direct an HTTP request. The host is the IP address of the server while the endpoint is looks like a path to a resource. An example host could be `localhost:8080` and an example endpoint is `GET /profile`. Once the HTTP request is directed to the right address and the server knows what the client wants from it, it can get started on the computation and send a response back!
+
+## What's On the Menu?
+
+Let's go back to our restaurant analogy. Our customer and staff now have a common language, but how does the customer know what they can order? They can't request just anything, because the kitchen might not have the ingredients or the chefs might not be familiar with the recipe. To deal with this issue the staff gives the customer a menu: a list of dishes they can order!
+
+The client and the server have something similar called an API. The server's API serves an interface for the client. It lets the client know what functions it can perform, and it's defined through the server's endpoints.
+
+### API Example
+
+I've thrown together a basic little Express server (see last week's slides for a recap on Express) to illustrate all of these concepts in a more hands on way. You can find it in the `api-example` folder. 
+
+In this Express app, I've defined a couple endpoints (which make up our API!):
+
+- GET / 
+- GET /fact
+- GET /facts
+- PUT /newfact:fact
+
+Each of these endpoints serves as a point of interaction between a client and a server. Try it out for yourself! You can run the server using `node index.js` when in the `api-example` directory.[^3]
+
+[^3]: The colon in the above PUT endpoint indicates an HTTP parameter. It allows us to pass information directly through the URL! 
+
+### More Review: Asynchronous Programming
+
+Now back to some review: asynchronous programming! Asynchronous programming is a powerful technique that allows us to execute code out of order rather than wait for the completion of each line. It's particularly useful when we make network requests, as we have no idea how long that request will take to be fulfilled (or if it will be fulfilled at all).[^4]
+
+[^4]: Some of you may recall from last week that Javascript (both in the browser and in node) is single-threaded. You may be wondering then, how is asynchronous programming implemented? Don't we need multiple threads to prevent blocking? Actually, no. In Javascript, asynchronous programming is implemented via a clever trick called a  callback queue. If you're interested, check out [this](https://archive.ph/N6DUl) article for more information!
+
+One option that Javascript provides for network requests is the `fetch` function. 
+
+implement cat fact functionality into note app
 
 
 

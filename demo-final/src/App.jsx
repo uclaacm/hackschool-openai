@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Note from './components/Note';
 import NoteSubmitter from './components/NoteSubmitter';
 import OpenAI from "openai";
@@ -13,6 +13,7 @@ const App = () => {
     dangerouslyAllowBrowser: true,
   }));
   const [systemPrompt, setSystemPrompt] = useState("");
+  const [image, setImage] = useState("");
 
   const titleHandler = (e) => {
     setTitle(e.target.value);
@@ -24,10 +25,9 @@ const App = () => {
 
   // submit note
   const submit = async () => {
-    // check if @gpt is present and send OpenAI API request if so
+    // process @gpt command to get assistant response
     if (title.includes("@gpt") || content.includes("@gpt")) {
       const prompt = `${title.replace("@gpt", "")} ${content.replace("@gpt", "")}`;
-      console.log(systemPrompt);
       const trimmedContent = content.trimEnd();
 
       // indicate that the query is being processed
@@ -38,10 +38,32 @@ const App = () => {
           { role: "system", content: systemPrompt },
           { role: "user", content: prompt }
         ],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4-1106-preview",
       })
       response = response.choices[0].message.content;
       setContent(`${trimmedContent}\n\n${response}`.trim());
+
+      return;
+    }
+
+    // process @img command to generate image
+    if (title.includes("@img") || content.includes("@img")) {
+      const prompt = `${title.replace("@img", "")} ${content.replace("@img", "")}`;
+      const trimmedContent = content.trimEnd();
+
+      // indicate that the query is being processed
+      setContent(`${trimmedContent}\n\nThinking...`.trim());
+
+      const imgResponse = await openai.images.generate({
+        model: "dall-e-3",
+        prompt
+      });
+      setImage(imgResponse.data[0].url);
+      console.log(imgResponse.data[0].url);
+
+      // remove image command so that user can submit note with new image
+      setTitle(`${title.replace("@img", "")}`);
+      setContent(`${trimmedContent.replace("@img", "")}`.trim());
       return;
     }
 
@@ -53,11 +75,13 @@ const App = () => {
 
     // add new note
     const newNote = {
-      title: title,
-      content: content
+      title,
+      content,
+      image,
     }
     const newNotes = [newNote, ...notes]
     setNotes(newNotes);
+    setImage(""); // clear image
 
     // write to local storage
     localStorage.setItem('notes', JSON.stringify(newNotes));
@@ -80,6 +104,7 @@ const App = () => {
     if (notes) {
       setNotes(notes);
     }
+
   }, []);
 
   // initialize system prompt to include all notes
@@ -101,6 +126,7 @@ const App = () => {
               key={id}
               title={note.title}
               content={note.content}
+              image={note.image}
               deleteHandler={() => deleteNote(id)}
             />
           ))}
@@ -110,6 +136,7 @@ const App = () => {
             contentHandler={contentHandler}
             content={content}
             buttonHandler={submit}
+            image={image}
           />
         </div>
       </div>

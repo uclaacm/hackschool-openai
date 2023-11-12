@@ -1,10 +1,12 @@
-import React from "react";
 import "./NoteSubmitter.css";
+
+import PropTypes from 'prop-types';
 
 const NoteSubmitter = ({
     titleHandler, title,
     contentHandler, content,
-    buttonHandler
+    buttonHandler,
+    image,
     }) => {
     return (
         <>
@@ -21,6 +23,10 @@ const NoteSubmitter = ({
                     onChange={contentHandler}
                     value={content}
                 />
+                {image ? <img 
+                    src={image}
+                    height="400px"
+                /> : null }
                 <button
                     id="button-submit"
                     onClick={(buttonHandler)}>+
@@ -29,5 +35,14 @@ const NoteSubmitter = ({
         </>
     );
 }
+
+NoteSubmitter.propTypes = {
+    titleHandler: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    contentHandler: PropTypes.func.isRequired,
+    content: PropTypes.string.isRequired,
+    buttonHandler: PropTypes.func.isRequired,
+    image: PropTypes.string,
+};
 
 export default NoteSubmitter;
