@@ -67,7 +67,7 @@ Kinda cool, right? Let's get into it.
 
 ## Why GitHub Copilot?
 
-You might be wondering, why should I as a web developer care about any of this? The bottom line is that it is going to remove a lot of the road blocks that people often hit as new developers, while also getting rid of a lot of the tedium that experienced engineers face! You won't have to look up obscure functions or quirky syntax any longer! It also makes reasoning about existing code much easier, as you can ask it to explain an existing code block or to generate unit tests or fix a bug. GitHub Copilot is also rapidly becoming the industry standard (though there are some signicant holdouts), and GitHub claims that it leads to "55% faster coding." Pretty cool! 
+You might be wondering, why should I as a web developer care about any of this? The bottom line is that it is going to remove a lot of the road blocks that people often hit as new developers, while also getting rid of a lot of the tedium that experienced engineers face! You won't have to look up obscure functions or quirky syntax any longer! It also makes reasoning about existing code much easier, as you can ask it to explain an existing code block or to generate unit tests or fix a bug. GitHub Copilot is also rapidly becoming the industry standard (though there are some significant holdouts), and GitHub claims that it leads to "55% faster coding." Pretty cool! 
 
 This all sounds pretty great, but its important to note that the technology is not perfect. It makes a lot of mistakes, so its important to review any generated code for errors! 
 
@@ -202,7 +202,7 @@ In my case, I want to add a new command: @cat. The way I want this to work is th
 4. Since, fetch returns a promise, we'll unwrap this promise using async/await.
 5. After that, we can append our new fact to the note!
 
-Let's try giving the above plan to Copilot and see what it comes up with! We can generate new code directly in our editor with the shortcut `CMD+I` on Mac (not sure what it is on Windows if I'm being honest, so my best guess is probably `Ctrl+I`). Here's the code it generated for me.
+Let's try giving the above plan to Copilot and see what it comes up with! We can generate new code directly in our editor with the shortcut `CMD+I` on Mac (not sure what it is on Windows if I'm being honest, but my best guess is probably `Ctrl+I`). Here's the code it generated for me.
 
 ```js
   // submit note
@@ -326,7 +326,7 @@ You can see Copilot made a lot of subtle mistakes in this case. This is why we a
 Now that we've gotten the warm up out of the way, we can go on to the exciting part of today's workshop: implementing the AI assistant. To do this, we're going to extend our apps commands to include:
 
 1. @gpt: This will prompt our AI assistant to respond to whatever we've written in the current note
-2. @img: This will prompt our AI assitant to generate an image based on the current note
+2. @img: This will prompt our AI assistant to generate an image based on the current note
 
 To implement both of these features, we're going to take advantage of the OpenAI API. We'll see that this API is bit more involved than our Cat Facts API. OpenAI has also implemented a layer of abstraction over it via their own library, so we're going to install that. As a result, we're not going to have to manually call `fetch` or anything like that, but the principles remain the same. Let's get started.
 
