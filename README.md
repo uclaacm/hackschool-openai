@@ -337,11 +337,11 @@ To implement both of these features, we're going to take advantage of the OpenAI
 2. Load some money into the balance. I loaded in $10 a few weeks ago and that has been more than enough.
 3. Generate an API key [here](https://platform.openai.com/api-keys). Make sure to copy it down somewhere.
 4. Install OpenAI library with `npm install openai` and import it into `App.jsx`.
-5. Initialize OpenAI object w/ API key (note: you should never hardcode your API key, but for simplicity we will).
+5. Initialize OpenAI object w/ API key (note: you should **NEVER** hardcode your API key, but for simplicity we will).
 
 ```js
 const [openai] = useState(new OpenAI({
-  apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
+  apiKey: API_KEY,
   dangerouslyAllowBrowser: true,
 }));
 const [systemPrompt, setSystemPrompt] = useState("");
@@ -444,7 +444,7 @@ if (title.includes('@img') || content.includes('@img')) {
   return;
 }
 ```
-For reference, the response object looks like this (the urls are images):
+For reference, the response object looks like this (the URLs are images):
 
 ```js
 {
@@ -466,3 +466,12 @@ For reference, the response object looks like this (the urls are images):
 
 ## Closing Remarks
 
+That wraps up our workshop! Hopefully it inspired you to make something cool (and made you a bit less nervous about your job security). If you're interested in taking things further, I highly recommend doing the following things:
+
+1. Reimplement the @gpt functionality using the new [Assistants API](https://platform.openai.com/docs/assistants/overview)! From what I've seen it's a bit more involved than the API we used, but it's likely to be preferred over the completions API in the future. The tools they provide (retrieval and function calling in particular) look super interesting. Give them a try! 
+
+2. Try implementing response streaming for a better UX! Note that this is not yet available in the assistants API so if you want to do this you'll need to use the completions API.
+
+3. Build your own app! There's no shortage to what you can do with this technology, so get out there and explore. If you need some [inspiration](https://platform.openai.com/examples), check out these examples from OpenAI.
+
+Stay safe out there! 
