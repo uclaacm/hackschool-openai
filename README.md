@@ -16,6 +16,7 @@
 - [What's On the Menu? (APIs)](#whats-on-the-menu)
 - [Implementing @cat](#implementing-cat)
 - [Implementing the AI Assistant](#implementing-the-ai-assistant)
+- [Closing Remarks](#closing-remarks)
 
 ## Prelude
 
@@ -332,21 +333,136 @@ To implement both of these features, we're going to take advantage of the OpenAI
 
 > Note: OpenAI's API is not free. But for our purposes, it's very cheap, only costing a fraction of a cent per request. The image generation API is a bit more expensive. Prices vary by model with GPT 4 tending to cost more than GPT 3.5. More details on pricing can be found on OpenAI's website.
 
-1. To start, we're going to want to make an OpenAI account.
-2. Load some money into the balance.
-3. Generate an API key.
-4. Install OpenAI library
-5. Initialize OpenAI object w/ API key (never hardcode API key, but for simplicity we will)
-6. Implement @gpt functionality[^6]
-7. System prompt is where we define role
-8. Test it out
-9. We want the user to be able to ask about their existing notes -> change system prompt (preface this is not the best way to implement this, but it'll do for now) (also have to do a bit on useEffect and life cycle)
-10. Test it out
-11. implement @img functionality
-12. Test it out
-13. cool
+1. To start, we're going to want to make an OpenAI account (if you haven't already) [here](https://platform.openai.com/docs/overview). 
+2. Load some money into the balance. I loaded in $10 a few weeks ago and that has been more than enough.
+3. Generate an API key [here](https://platform.openai.com/api-keys). Make sure to copy it down somewhere.
+4. Install OpenAI library with `npm install openai` and import it into `App.jsx`.
+5. Initialize OpenAI object w/ API key (note: you should never hardcode your API key, but for simplicity we will).
+
+```js
+const [openai] = useState(new OpenAI({
+  apiKey: import.meta.env.VITE_APP_OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+}));
+const [systemPrompt, setSystemPrompt] = useState("");
+
+```
+
+6. Implement @gpt functionality[^6]. [This](https://platform.openai.com/docs/quickstart?context=node) page will be helpful to get you started. Can see the final code below:
+
+```js
+// check for @gpt command
+let newContent = content.trim();
+if (title.includes('@gpt') || content.includes('@gpt')) {
+  const prompt = title + " " + content;
+
+  setContent(newContent + `\n\nThinking...`);
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4-1106-preview",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: prompt },
+    ]
+  });
+
+  const data = response.choices[0].message.content;
+  newContent += `\n\n${data}`;
+  setTitle(title.replace("@gpt", ""));
+  setContent(newContent.replace("@gpt", ""));
+  return;
+}
+```
+
+As a [reference](https://platform.openai.com/docs/api-reference/chat/object), the response object looks like the following:
+
+```js
+{
+  "id": "chatcmpl-123",
+  "object": "chat.completion",
+  "created": 1677652288,
+  "model": "gpt-3.5-turbo-0613",
+  "system_fingerprint": "fp_44709d6fcb",
+  "choices": [{
+    "index": 0,
+    "message": {
+      "role": "assistant",
+      "content": "\n\nHello there, how may I assist you today?",
+    },
+    "finish_reason": "stop"
+  }],
+  "usage": {
+    "prompt_tokens": 9,
+    "completion_tokens": 12,
+    "total_tokens": 21
+  }
+}
+
+```
+
+7. We want the assistant to be able to read the user's notes. For simplicity, we'll just pass this information into the system prompt (which is where we define the role of the assistant). In reality, this is not a good way of doing this, but for the sake of the workshop and keeping things simple, it's what we're going to do. <br><br>We want to update the system prompt so that it reflects the contents of all of the user's notes. We this update to be performed every time a new note is added to the notes array. How can we accomplish this? Luckily, React has a built in function called `useEffect` that does just this!
+
+```js
+useEffect(action, dependencyArray)
+```
+
+In the above example, useEffect will call the `action` function whenever an item in the dependency array is modified! If the array is empty, then the action will only be called upon initial render of the app. 
+
+Let's add the following code to update our prompt!
+
+```js
+ // initialize system prompt to include all notes
+useEffect(() => {
+  let prompt = "Answer questions based on the user's notes. You should always identify the notes where you got the information by title. If the user does not ask a question about the notes, then answer as an AI assistant. The notes are shown here: \n\n";
+  
+  notes.forEach((note) => {
+    prompt += `(Title: ${note.title}\n\nContent:\n${note.content})\n\n`;
+  });
+  setSystemPrompt(prompt);
+}, [notes]);
+```
+
+11. Now we can similarly implement @img (based on [this](https://platform.openai.com/docs/api-reference/images/create) documentation).
+
+```js
+// check for @img command
+if (title.includes('@img') || content.includes('@img')) {
+  const prompt = title + " " + content;
+
+  setContent(newContent + `\n\nThinking...`);
+
+  const response = await openai.images.generate({
+    model: "dall-e-3",
+    prompt: prompt,
+  });
+
+  setImage(response.data[0].url);
+
+  // remove image command so that user can submit note with new image
+  setTitle(title.replace("@img", ""));
+  setContent(content.replace("@img", ""));
+  return;
+}
+```
+For reference, the response object looks like this (the urls are images):
+
+```js
+{
+  "created": 1589478378,
+  "data": [
+    {
+      "url": "https://..."
+    },
+    {
+      "url": "https://..."
+    }
+  ]
+}
+```
+
+12. cool beans
 
 [^6]: While I was working on this workshop, OpenAI released a new API called the assistants API. I decided not to include it here, because it's still in beta, but keep in mind that that is likely going to be the preferred API in the future.
 
-TODO: flesh out demo above in readme
-TODO: closing remarks on generative AI
+## Closing Remarks
+

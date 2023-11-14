@@ -118,6 +118,7 @@ const App = () => {
   // initialize system prompt to include all notes
   useEffect(() => {
     let prompt = "Answer questions based on the user's notes. You should always identify the notes where you got the information by title. If the user does not ask a question about the notes, then answer as an AI assistant. The notes are shown here: \n\n";
+    
     notes.forEach((note) => {
       prompt += `(Title: ${note.title}\n\nContent:\n${note.content})\n\n`;
     });
