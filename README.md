@@ -472,6 +472,6 @@ That wraps up our workshop! Hopefully it inspired you to make something cool (an
 
 2. Try implementing response streaming for a better UX! Note that this is not yet available in the assistants API so if you want to do this you'll need to use the completions API.
 
-3. Build your own app! There's no shortage to what you can do with this technology, so get out there and explore. If you need some [inspiration](https://platform.openai.com/examples), check out these examples from OpenAI.
+3. Build your own app! There's no shortage to what you can do with this technology, so get out there and explore. If you need some inspiration, check out [these](https://platform.openai.com/examples) examples from OpenAI.
 
 Stay safe out there! 
