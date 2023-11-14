@@ -400,7 +400,7 @@ As a [reference](https://platform.openai.com/docs/api-reference/chat/object), th
 
 ```
 
-7. We want the assistant to be able to read the user's notes. For simplicity, we'll just pass this information into the system prompt (which is where we define the role of the assistant). In reality, this is not a good way of doing this, but for the sake of the workshop and keeping things simple, it's what we're going to do. <br><br>We want to update the system prompt so that it reflects the contents of all of the user's notes. We this update to be performed every time a new note is added to the notes array. How can we accomplish this? Luckily, React has a built in function called `useEffect` that does just this!
+7. We want the assistant to be able to read the user's notes. For simplicity, we'll just pass this information into the system prompt (which is where we define the role of the assistant). In reality, this is not a good way of doing this, but for the sake of the workshop and keeping things simple, it's what we're going to do. <br><br>We want to update the system prompt so that it reflects the contents of all of the user's notes. We want this update to be performed every time a new note is added to the notes array. How can we accomplish this? Luckily, React has a built in function called `useEffect` that does just this!
 
 ```js
 useEffect(action, dependencyArray)
