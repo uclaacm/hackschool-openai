@@ -36,21 +36,26 @@ let facts = [
     "The first cat in space was a French cat named Félicette (or 'Astrocat') who, in 1963, survived a trip to space that lasted 13 minutes."
 ]
 
-
+// Root page
 app.get('/', (_, res) => {
     res.send('Use /fact to see an interesting cat fact!');
 });
 
+
+// Sends a random cat fact in plain text
 app.get('/fact', (_, res) => {
     const randomIndex = Math.floor(Math.random() * facts.length);
     const randomFact = facts[randomIndex];
     res.send(randomFact);
 });
 
+
+// Sends all facts on the server
 app.get('/facts', (_, res) => {
     res.send(facts);
 });
 
+// Adds the fact param to the list of cat facts.
 app.put('/newfact:fact', (req, res) => {
     const newFact = req.params.fact.slice(1);
     facts.push(newFact);
