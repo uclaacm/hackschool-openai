@@ -20,9 +20,10 @@
 
 ## Prelude
 
-This workshop was presented as the sixth installment of Hackschool 2023, a workshop series offered by ACM Hack at UCLA. Its intended audience is those new to web development who may be be thinking about pursuing a career as a Software Engineer or Full Stack Developer or some other name for someone who codes for a living. Check out the slides for the workshop and our website below.
+This workshop was presented as the sixth installment of Hackschool 2023, a workshop series offered by ACM Hack at UCLA. Its intended audience is those new to web development who may be be thinking about pursuing a career as a Software Engineer or Full Stack Developer or some other name for someone who codes for a living. Check out the slides/recording for the workshop and our website below.
 
 Slides: [Hackschool Session 6](https://tinyurl.com/hackschools6) <br>
+Recording: [ACM at UCLA Youtube](https://www.youtube.com/watch?v=fe3zd8NTCVU) <br>
 Website: [hack.uclaacm.com](https://hack.uclaacm.com/) <br>
 
 ### Goals
